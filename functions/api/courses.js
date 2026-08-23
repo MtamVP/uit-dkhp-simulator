@@ -4,7 +4,8 @@ export async function onRequestGet(context) {
   let authHeader = request.headers.get("Authorization");
   let usedShared = false;
   
-  let kvStatus = env.DKHP_KV ? "Đã liên kết (Bound)" : "Chưa liên kết (Unbound)";
+  let envKeys = Object.keys(env || {}).join(", ");
+  let kvStatus = env.DKHP_KV ? "Đã liên kết (Bound)" : `Chưa liên kết. Các biến hiện có trên server: [${envKeys}]`;
 
   try {
     if (authHeader) {

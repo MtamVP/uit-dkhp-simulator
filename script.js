@@ -510,6 +510,8 @@ async function fetchCourses(isAuto = false) {
     
     if (token) {
         localStorage.setItem('dkhp_token', token);
+    } else {
+        localStorage.removeItem('dkhp_token');
     }
     
     refreshBtn.innerText = 'Đang tải...';
