@@ -532,8 +532,12 @@ async function fetchCourses(isAuto = false) {
         });
         
         if (!response.ok) {
-            if(response.status === 401) throw new Error("Token đã hết hạn hoặc không hợp lệ!");
-            throw new Error('Lỗi máy chủ: ' + response.status);
+            let errorMsg = 'Lỗi máy chủ: ' + response.status;
+            try {
+                const errorData = await response.json();
+                if (errorData.error) errorMsg = errorData.error;
+            } catch (e) {}
+            throw new Error(errorMsg);
         }
         
         const data = await response.json();
