@@ -15,21 +15,27 @@ function switchTab(tabId) {
     document.getElementById('tab-register').style.display = 'none';
     document.getElementById('tab-registered').style.display = 'none';
     document.getElementById('tab-guide').style.display = 'none';
+    const everytimeTab = document.getElementById('tab-everytime');
+    if (everytimeTab) everytimeTab.style.display = 'none';
     
     document.getElementById('nav-dashboard').classList.remove('active');
     document.getElementById('nav-register').classList.remove('active');
     document.getElementById('nav-registered').classList.remove('active');
     document.getElementById('nav-guide').classList.remove('active');
+    const navEvery = document.getElementById('nav-everytime');
+    if (navEvery) navEvery.classList.remove('active');
     
     document.getElementById('tab-' + tabId).style.display = 'block';
-    document.getElementById('nav-' + tabId).classList.add('active');
+    const activeNav = document.getElementById('nav-' + tabId);
+    if(activeNav) activeNav.classList.add('active');
     
     // Cập nhật URL trên trình duyệt
     const pathMap = {
         'dashboard': '/dashboard',
         'register': '/courses',
         'registered': '/registered',
-        'guide': '/guide'
+        'guide': '/guide',
+        'everytime': '/everytime'
     };
     if (window.location.pathname !== pathMap[tabId]) {
         history.pushState({ tab: tabId }, '', pathMap[tabId]);
@@ -58,6 +64,7 @@ window.addEventListener('popstate', (e) => {
         if (path === '/dashboard') switchTab('dashboard');
         else if (path === '/registered') switchTab('registered');
         else if (path === '/guide') switchTab('guide');
+        else if (path === '/everytime') switchTab('everytime');
         else switchTab('register');
     }
 });
@@ -68,6 +75,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (path === '/dashboard') switchTab('dashboard');
     else if (path === '/registered') switchTab('registered');
     else if (path === '/guide') switchTab('guide');
+    else if (path === '/everytime') switchTab('everytime');
     else switchTab('register');
 });
 
