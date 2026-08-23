@@ -682,30 +682,37 @@ excelUpload.addEventListener('change', (e) => {
         try {
             const data = new Uint8Array(e.target.result);
             const workbook = XLSX.read(data, {type: 'array'});
-            const firstSheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[firstSheetName];
+            let allRows = [];
             
-            // Chuyển excel thành mảng json (bỏ qua các dòng trống ở đầu tự động bằng blankrows: false)
-            // Tuy nhiên, do có 7 dòng title rác, ta parse raw trước để tìm dòng header
-            const rawJson = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-            
-            let headerRowIndex = -1;
-            for (let i = 0; i < Math.min(20, rawJson.length); i++) {
-                const rowStr = (rawJson[i] || []).join('').toUpperCase();
-                if (rowStr.includes('STT') || rowStr.includes('MAMH') || rowStr.includes('MÃ MH')) {
-                    headerRowIndex = i;
-                    break;
+            workbook.SheetNames.forEach(sheetName => {
+                const lowerName = sheetName.toLowerCase();
+                if (lowerName.includes('lưới phòng') || lowerName.includes('luoi phong')) {
+                    return; // Bỏ qua sheet lưới phòng
                 }
+                
+                const worksheet = workbook.Sheets[sheetName];
+                const rawJson = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                
+                let headerRowIndex = -1;
+                for (let i = 0; i < Math.min(20, rawJson.length); i++) {
+                    const rowStr = (rawJson[i] || []).join('').toUpperCase();
+                    if (rowStr.includes('STT') || rowStr.includes('MAMH') || rowStr.includes('MÃ MH')) {
+                        headerRowIndex = i;
+                        break;
+                    }
+                }
+                
+                if (headerRowIndex !== -1) {
+                    const sheetRows = XLSX.utils.sheet_to_json(worksheet, { range: headerRowIndex, raw: false, defval: '' });
+                    allRows = allRows.concat(sheetRows);
+                }
+            });
+            
+            if (allRows.length === 0) {
+                throw new Error("Không tìm thấy dữ liệu hợp lệ (thiếu tiêu đề STT, MÃ MH...) ở bất kỳ sheet nào.");
             }
             
-            if (headerRowIndex === -1) {
-                throw new Error("Không tìm thấy dòng tiêu đề (STT, MÃ MH...) trong file Excel.");
-            }
-            
-            // Đọc lại với header đúng
-            const rows = XLSX.utils.sheet_to_json(worksheet, { range: headerRowIndex, raw: false, defval: '' });
-            
-            rawData = normalizeExcelData(rows);
+            rawData = normalizeExcelData(allRows);
             
             // Cập nhật giao diện
             document.getElementById('stats').innerText = `(DỮ LIỆU TỪ EXCEL - ${rawData.length} lớp)`;
