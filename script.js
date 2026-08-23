@@ -703,7 +703,7 @@ excelUpload.addEventListener('change', (e) => {
             }
             
             // Đọc lại với header đúng
-            const rows = XLSX.utils.sheet_to_json(worksheet, { range: headerRowIndex });
+            const rows = XLSX.utils.sheet_to_json(worksheet, { range: headerRowIndex, raw: false, defval: '' });
             
             rawData = normalizeExcelData(rows);
             
@@ -747,16 +747,21 @@ function normalizeExcelData(rows) {
         let mamh = row['MAMH'] || row['MÃ MH'] || malop.split('.')[0];
         let tenmh = row['TENMH'] || row['TÊN MÔN HỌC'] || '';
         let giangvien = row['CBGD'] || row['TENGV'] || row['TÊN GIẢNG VIÊN'] || row['MÃ GIẢNG VIÊN'] || '';
-        let sisotoida = row['SISO'] || row['SĨ SỐ'] || 0;
+        let siso = row['SISO'] || row['SĨ SỐ'] || 0;
         let sotc = row['SOTC'] || row['SỐ TC'] || 0;
-        let isTH = row['THUCHANH'] || row['THỰC HÀNH'];
+        let isTH = row['THUCHANH'] || row['THỰC HÀNH'] || row['THUC HANH'];
         
         let thu = row['THU'] || row['THỨ'];
         let tiet = row['TIET'] || row['TIẾT'];
+        let phonghoc = row['PHONGHOC'] || row['PHONGH OC'] || row['PHÒNG HỌC'] || row['PHONG HOC'] || '';
+        let nbd = row['NBD'] || row['NGÀY BẮT ĐẦU'] || row['NGAYBATDAU'] || '';
+        let nkt = row['NKT'] || row['NGÀY KẾT THÚC'] || row['NGAYKETTHUC'] || '';
+
         // Tái tạo lại chuỗi thời gian học (T2 (1,2,3))
         let tghoc = '';
         if (thu && tiet) {
             tghoc = `T${thu} (${tiet.toString().split('').join(',')})`;
+            if (phonghoc) tghoc += ` - ${phonghoc}`;
         }
         
         normalized.push({
@@ -764,10 +769,13 @@ function normalizeExcelData(rows) {
             mamh: mamh.toString().trim(),
             tenmh: tenmh.toString().trim(),
             giangvien: giangvien.toString().trim(),
-            sisotoida: parseInt(sisotoida) || 0,
+            siso: parseInt(siso) || 0,
+            dadk: 0,
             sotc: parseInt(sotc) || 0,
             thuchanh: (isTH == 1 || isTH == '1' || isTH === 'Có') ? 1 : 0,
-            tghoc: tghoc
+            tghoc: tghoc,
+            ngaybatdau: nbd ? nbd.toString().trim() : '',
+            ngayketthuc: nkt ? nkt.toString().trim() : ''
         });
     });
     return normalized;
