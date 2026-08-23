@@ -557,14 +557,17 @@ async function fetchCourses(isAuto = false, isInitial = false) {
             tokenInput.style.backgroundColor = '#e8f5e9';
             tokenInput.style.borderColor = '#c3e6cb';
         } else if (token && !isAuto && !isInitial) {
-            // Hiện lời cảm ơn nếu user tự nhập token và bấm Tải Dữ Liệu thành công
-            Swal.fire({
-                title: 'Cảm ơn bạn đã chia sẻ!',
-                html: 'Hành động chia sẻ Token của bạn vừa giúp đỡ rất nhiều sinh viên khác.<br><br><i>Token của bạn đã được hệ thống mã hoá và lưu trữ an toàn trên cloudflare, không ai có thể xem được!</i>',
-                icon: 'success',
-                timer: 4500,
-                showConfirmButton: false
-            });
+            // Hiện lời cảm ơn nếu user tự nhập token mới
+            if (window.lastThankedToken !== token) {
+                window.lastThankedToken = token;
+                Swal.fire({
+                    title: 'Cảm ơn bạn đã chia sẻ!',
+                    html: 'Hành động chia sẻ Token của bạn vừa giúp đỡ rất nhiều sinh viên khác.<br><br><i>Token của bạn đã được hệ thống mã hoá và lưu trữ an toàn trên cloudflare, không ai có thể xem được!</i>',
+                    icon: 'success',
+                    timer: 4500,
+                    showConfirmButton: false
+                });
+            }
         }
         
         stats.innerText = `(Tổng cộng: ${rawData.length} lớp - Cập nhật lúc: ${new Date().toLocaleTimeString()})`;
@@ -585,7 +588,7 @@ async function fetchCourses(isAuto = false, isInitial = false) {
     }
 }
 
-refreshBtn.addEventListener('click', fetchCourses);
+refreshBtn.addEventListener('click', () => fetchCourses(false, false));
 
 let intervalId = null;
 autoRefreshCb.addEventListener('change', (e) => {
