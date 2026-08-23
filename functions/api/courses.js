@@ -5,16 +5,18 @@ export async function onRequestGet(context) {
   let usedShared = false;
   
   let envKeys = Object.keys(env || {}).join(", ");
-  let kvStatus = env.DKHP_KV ? "Đã liên kết (Bound)" : `Chưa liên kết. Các biến hiện có trên server: [${envKeys}]`;
+  let type = typeof env.UIT_DKHP_KV;
+  let val = String(env.UIT_DKHP_KV);
+  let kvStatus = `Type: ${type}, Val: ${val}, Keys: [${envKeys}]`;
 
   try {
     if (authHeader) {
-      if (env.DKHP_KV) {
-        await env.DKHP_KV.put("SHARED_TOKEN", authHeader);
+      if (env.UIT_DKHP_KV) {
+        await env.UIT_DKHP_KV.put("SHARED_TOKEN", authHeader);
       }
     } else {
-      if (env.DKHP_KV) {
-        authHeader = await env.DKHP_KV.get("SHARED_TOKEN");
+      if (env.UIT_DKHP_KV) {
+        authHeader = await env.UIT_DKHP_KV.get("SHARED_TOKEN");
         usedShared = true;
       }
     }
@@ -41,8 +43,8 @@ export async function onRequestGet(context) {
     });
 
     if (response.status === 401) {
-      if (usedShared && env.DKHP_KV) {
-        await env.DKHP_KV.delete("SHARED_TOKEN");
+      if (usedShared && env.UIT_DKHP_KV) {
+        await env.UIT_DKHP_KV.delete("SHARED_TOKEN");
       }
       return new Response(JSON.stringify({ error: usedShared ? "Token cộng đồng đã hết hạn. Xin hãy đóng góp Token mới!" : "Token của bạn đã hết hạn hoặc không hợp lệ!" }), {
         status: 401,
