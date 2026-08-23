@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ĐKHP</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="icon" href="assets/favicon.ico">
+</head>
+<body>
+    <div class="header">
+        <div class="header-logo"><span style="color:#0052cc">UIT</span> <span style="color:#20a8d8">- ĐKHP</span></div>
+        <div class="header-nav">
+            <a href="#" onclick="switchTab('dashboard')" id="nav-dashboard">Dashboard</a>
+            <a href="#" onclick="switchTab('register')" id="nav-register" class="active">Đăng ký Học phần</a>
+            <a href="#" onclick="switchTab('registered')" id="nav-registered">Danh sách Lớp Đã Đăng ký</a>
+            <a href="#" onclick="switchTab('guide')" id="nav-guide">Hướng dẫn lấy Token</a>
+        </div>
+        <div class="user-info">👤 Võ Phúc Minh Tâm</div>
+    </div>
+    
+    <!-- MÀN HÌNH DASHBOARD -->
+    <div class="container" id="tab-dashboard" style="display: none;">
+        <h2 style="text-align: center; color: #333; font-size: 18px; margin-bottom: 25px;">TRANG ĐĂNG KÝ HỌC PHẦN - TRƯỜNG ĐẠI HỌC CÔNG NGHỆ THÔNG TIN</h2>
+        
+        <div style="background: #fff; border: 1px solid #e0e0e0; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); max-width: 900px; margin: 0 auto;">
+            
+            <div style="padding: 20px 30px; border-bottom: 1px solid #e0e0e0;">
+                <h3 style="text-align: center; font-size: 16px; margin-top: 0; color: #333;">HƯỚNG DẪN ĐĂNG KÝ HỌC PHẦN</h3>
+                <ol style="font-size: 14px; color: #444; line-height: 1.8; margin-bottom: 0;">
+                    <li>Nhấn vào trình đơn Đăng ký Học phần</li>
+                    <li>Chọn các lớp cần đăng ký</li>
+                    <li>Nhấn vào nút Đăng ký</li>
+                    <li>Chờ hệ thống xử lý thông báo kết quả</li>
+                    <li>Sau khi có kết quả xử lý, sinh viên kiểm tra và thực hiện chọn đăng ký tiếp, quay lại bước 1</li>
+                </ol>
+            </div>
+            
+            <div style="padding: 20px 30px;">
+                <h3 style="text-align: center; color: #0056b3; font-size: 16px; margin-top: 0; margin-bottom: 20px;">QUY ĐỊNH ĐĂNG KÝ HỌC PHẦN</h3>
+                <p style="font-size: 14px; color: #444; line-height: 1.6;">Nhằm bảo đảm tính công bằng, minh bạch và trật tự trong công tác đăng ký học phần (ĐKHP), Trường Đại học CNTT yêu cầu sinh viên nghiêm túc chấp hành các quy định sau:</p>
+                
+                <p style="font-size: 14px; color: #222; margin-bottom: 5px;"><b>1. Thực hiện ĐKHP đúng nhu cầu học tập – không đăng ký chiếm chỗ, đăng ký thay</b></p>
+                <p style="font-size: 14px; color: #444; line-height: 1.6; margin-top: 0; padding-left: 15px;">Sinh viên chỉ đăng ký các học phần thực sự có nhu cầu học, phù hợp với kế hoạch học tập cá nhân. Sinh viên không được thực hiện các hành vi đăng ký chiếm chỗ, đăng ký thay hoặc nhận chỗ từ người khác, bao gồm:</p>
+                <ul style="font-size: 14px; color: #444; line-height: 1.6; padding-left: 35px; margin-top: 5px;">
+                    <li>Đăng ký rồi hủy mà không có lý do chính đáng;</li>
+                    <li>Đăng ký học phần khi không có nhu cầu học, nhằm chiếm chỗ và gây ảnh hưởng đến quyền lợi của sinh viên khác;</li>
+                    <li>Lợi dụng các chính sách thông thoáng, thuận tiện trong ĐKHP để nhường và nhận chỗ.</li>
+                </ul>
+
+                <p style="font-size: 14px; color: #222; margin-bottom: 5px; margin-top: 20px;"><b>2. Không sử dụng công cụ tự động khi ĐKHP</b></p>
+                <p style="font-size: 14px; color: #444; line-height: 1.6; margin-top: 0; padding-left: 15px;">Sinh viên không được sử dụng các công cụ hỗ trợ ĐKHP tự động (không do Trường cung cấp). Việc sử dụng công cụ có thể gây mất công bằng trong ĐKHP và không đảm bảo an toàn thông tin.</p>
+                
+                <p style="font-size: 14px; color: #444; line-height: 1.6; margin-top: 20px;">Trường yêu cầu toàn thể sinh viên nghiêm túc thực hiện các nội dung trên và phối hợp để xây dựng môi trường học tập công bằng, văn minh và đúng quy định. Mọi trường hợp sinh viên vi phạm sẽ bị Trường xem xét xử lý kỷ luật.</p>
+                <p style="font-size: 14px; color: #222; margin-top: 15px;"><b>Trân trọng.</b></p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- MÀN HÌNH ĐĂNG KÝ -->
+    <div class="container" id="tab-register">
+        <div class="settings-bar">
+            <input type="text" id="tokenInput" placeholder="Dán Bearer Token vào đây...">
+            <button id="refreshBtn">Tải Dữ Liệu</button>
+            <button onclick="switchTab('guide')" style="background-color: #6c757d; margin-right: 15px;">❓ Hướng dẫn</button>
+            <label style="font-size: 14px; font-weight: bold; color: #333; display: flex; align-items: center; gap: 5px;">
+                <input type="checkbox" id="autoRefresh"> Tự động làm mới (10s)
+            </label>
+        </div>
+
+        <h2>Danh sách Lớp mở chờ đăng ký <span id="stats" style="font-weight:normal; font-size: 14px; margin-left: 20px; color: #666;">Chưa tải dữ liệu</span></h2>
+        <input type="text" id="searchInput" class="search-box" placeholder="Nhập vào Mã môn học hoặc mã lớp để tìm kiếm, nhiều lớp cách nhau dấu phẩy, khoảng trắng...">
+        
+        <form onsubmit="return false;">
+            <table id="courseTable">
+                <thead>
+                    <tr>
+                        <th class="checkbox-col"></th>
+                        <th>Mã lớp</th>
+                        <th>Môn học</th>
+                        <th>SốTC</th>
+                        <th>Thời gian học</th>
+                        <th>Giảng viên</th>
+                        <th>Đã ĐK/Sĩ số</th>
+                        <th>Còn trống</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Data will be injected here -->
+                </tbody>
+            </table>
+        </form>
+    </div>
+    
+    <!-- Thanh Đăng Ký Môn Được Chọn (Mới) -->
+    <div class="selected-bar" id="selectedBar">
+        <div class="selected-chips" id="selectedChipsContainer">
+            <!-- Chips injected here -->
+        </div>
+        <button class="btn-register-teal" id="btnRegisterSelected" onclick="registerSelectedCourses()">Đăng ký 0 lớp, 0 tc</button>
+    </div>
+
+    <!-- MÀN HÌNH LỚP ĐÃ ĐĂNG KÝ -->
+    <div class="container" id="tab-registered" style="display: none;">
+        <h2 id="registered-title" style="color: #000; font-size: 18px;">Danh Sách Lớp học Đã Đăng ký</h2>
+        <table id="registeredTable">
+            <thead>
+                <tr>
+                    <th class="checkbox-col"></th>
+                    <th>Mã Lớp</th>
+                    <th>Mã MH/ Tên MH</th>
+                    <th>Thời Gian học</th>
+                    <th>Giảng viên</th>
+                    <th>Số tín chỉ</th>
+                    <th>ĐãĐK/SS</th>
+                </tr>
+            </thead>
+            <tbody id="registeredTableBody">
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Thanh Huỷ Môn Được Chọn -->
+    <div class="selected-bar" id="selectedDeleteBar" style="display: none; border-top: 1px solid #dc3545;">
+        <div class="selected-chips" id="selectedDeleteChipsContainer">
+            <!-- Chips injected here -->
+        </div>
+        <button class="btn-register-teal" id="btnDeleteSelected" style="background: #dc3545;" onclick="deleteSelectedCourses()">Xoá 0 lớp, 0 tc</button>
+    </div>
+
+    <!-- MODAL KẾT QUẢ ĐĂNG KÝ -->
+    <div id="resultModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <h3>KẾT QUẢ ĐĂNG KÝ</h3>
+            
+            <div class="result-group">
+                <div class="result-title success">✔ <span id="successCount">0</span> Lớp Thành công</div>
+                <div class="result-list" id="successList"></div>
+            </div>
+            
+            <div class="result-group">
+                <div class="result-title error">! <span id="errorCount">0</span> Lớp bị lỗi</div>
+                <div class="result-list" id="errorList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MÀN HÌNH HƯỚNG DẪN -->
+    <div class="container" id="tab-guide" style="display: none;">
+        <h2 style="text-align: center; color: #333; font-size: 18px; margin-bottom: 25px;">HƯỚNG DẪN LẤY BEARER TOKEN TỪ TRANG ĐKHP</h2>
+        
+        <div style="background: #fff; border: 1px solid #e0e0e0; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); max-width: 900px; margin: 0 auto; padding: 20px 30px;">
+            <p style="font-size: 14px; color: #444; line-height: 1.6;">Để sử dụng được tool mô phỏng này, bạn cần lấy mã Bearer Token từ phiên đăng nhập thật của bạn trên trang web trường.</p>
+            
+            <h3 style="font-size: 15px; color: #0056b3;">Các bước thực hiện:</h3>
+            <ul style="font-size: 14px; color: #444; line-height: 1.6;">
+                <li><b>Bước 1:</b> Truy cập vào trang <a href="https://dkhp.uit.edu.vn" target="_blank">dkhp.uit.edu.vn</a> và đăng nhập.</li>
+                <li><b>Bước 2:</b> Nhấn phím <b>F12</b> để mở Developer Tools, chuyển sang tab <b>Network</b>. Sau đó nhớ nhấn reload page để tải lại trang.</li>
+                <li><b>Bước 3:</b> Chọn một request bất kỳ, cuộn xuống phần <b>Request Headers</b> và copy toàn bộ chuỗi <code>Authorization: Bearer...</code></li>
+            </ul>
+            
+            <div style="text-align: center; margin: 20px 0;">
+                <img src="assets/instruct.png" alt="Hướng dẫn lấy Token bằng hình ảnh" style="max-width: 100%; border: 1px solid #ccc; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button onclick="switchTab('register')" class="btn-register-teal">Đã hiểu, quay lại Đăng ký ngay</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
