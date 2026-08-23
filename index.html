@@ -69,13 +69,13 @@
     
     <!-- MÀN HÌNH ĐĂNG KÝ -->
     <div class="container" id="tab-register">
-        <div class="controls" style="display: flex; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+        <div class="settings-bar">
             <input type="text" id="tokenInput" placeholder="Nhập Token của bạn vào đây, nếu không có tự động xài Token cộng đồng..." style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
-            <button id="refreshBtn" class="btn btn-primary">Tải Dữ Liệu</button>
+            <button id="refreshBtn">Tải Dữ Liệu</button>
             <input type="file" id="excelUpload" accept=".xlsx, .xls" style="display: none;">
-            <button class="btn btn-primary" style="background-color: #28a745; border-color: #28a745;" onclick="document.getElementById('excelUpload').click()">Tải Excel</button>
-            <button class="btn btn-secondary" onclick="switchTab('instruction')">❓ Hướng dẫn</button>
-            <label style="display: flex; align-items: center; gap: 5px; font-size: 14px;">
+            <button style="background-color: #28a745;" onclick="document.getElementById('excelUpload').click()">Tải Excel</button>
+            <button onclick="switchTab('instruction')" style="background-color: #6c757d;">❓ Hướng dẫn</button>
+            <label style="display: flex; align-items: center; gap: 5px; font-size: 14px; font-weight: bold; margin-left: 10px;">
                 <input type="checkbox" id="autoRefresh"> Tự động làm mới (10s)
             </label>
         </div>
