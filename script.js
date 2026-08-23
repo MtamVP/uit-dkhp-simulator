@@ -578,6 +578,10 @@ async function fetchCourses(isAuto = false, isInitial = false) {
             }
         }
         
+        if (!rawData || rawData.length === 0) {
+            throw new Error('Hệ thống ĐKHP trả về 0 lớp (có thể đang ngoài giờ mở cửa 9h-16h).');
+        }
+        
         stats.innerText = `(Tổng cộng: ${rawData.length} lớp - Cập nhật lúc: ${new Date().toLocaleTimeString()})`;
         
         searchInput.dispatchEvent(new Event('input'));
