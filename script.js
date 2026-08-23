@@ -502,18 +502,15 @@ function renderTable(data) {
 
 async function fetchCourses(isAuto = false) {
     let token = tokenInput.value.trim();
-    if (!token) {
-        if (!isAuto) Swal.fire('Thông báo', 'Vui lòng dán Token vào trước!', 'warning');
-        if (isAuto) autoRefreshCb.checked = false;
-        return;
-    }
     
-    if (!token.startsWith('Bearer ')) {
+    if (token && !token.startsWith('Bearer ')) {
         token = 'Bearer ' + token;
         tokenInput.value = token;
     }
     
-    localStorage.setItem('dkhp_token', token);
+    if (token) {
+        localStorage.setItem('dkhp_token', token);
+    }
     
     refreshBtn.innerText = 'Đang tải...';
     refreshBtn.disabled = true;
@@ -521,12 +518,17 @@ async function fetchCourses(isAuto = false) {
     try {
         const targetUrl = '/api/courses';
         
+        const headers = {
+            'Accept': 'application/json'
+        };
+        
+        if (token) {
+            headers['Authorization'] = token;
+        }
+        
         const response = await fetch(targetUrl, {
             method: 'GET',
-            headers: {
-                'Authorization': token,
-                'Accept': 'application/json'
-            }
+            headers: headers
         });
         
         if (!response.ok) {
@@ -584,6 +586,5 @@ searchInput.addEventListener('input', (e) => {
     renderTable(filtered);
 });
 
-if(tokenInput.value) {
-    fetchCourses();
-}
+// Không bắt buộc phải có Token mới gọi hàm ban đầu nữa
+fetchCourses();
