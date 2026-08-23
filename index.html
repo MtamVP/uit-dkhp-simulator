@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ĐKHP</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="icon" href="assets/favicon.ico">
 </head>
@@ -68,16 +69,21 @@
     
     <!-- MÀN HÌNH ĐĂNG KÝ -->
     <div class="container" id="tab-register">
-        <div class="settings-bar">
-            <input type="text" id="tokenInput" placeholder="Dán Token vào đây để chia sẻ cho mọi người (Không bắt buộc)...">
-            <button id="refreshBtn">Tải Dữ Liệu</button>
-            <button onclick="switchTab('guide')" style="background-color: #6c757d; margin-right: 15px;">❓ Hướng dẫn</button>
-            <label style="font-size: 14px; font-weight: bold; color: #333; display: flex; align-items: center; gap: 5px;">
+        <div class="controls" style="display: flex; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+            <input type="text" id="tokenInput" placeholder="Nhập Token của bạn vào đây, nếu không có tự động xài Token cộng đồng..." style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+            <button id="refreshBtn" class="btn btn-primary">Tải Dữ Liệu</button>
+            <input type="file" id="excelUpload" accept=".xlsx, .xls" style="display: none;">
+            <button class="btn btn-primary" style="background-color: #28a745; border-color: #28a745;" onclick="document.getElementById('excelUpload').click()">Tải Excel</button>
+            <button class="btn btn-secondary" onclick="switchTab('instruction')">❓ Hướng dẫn</button>
+            <label style="display: flex; align-items: center; gap: 5px; font-size: 14px;">
                 <input type="checkbox" id="autoRefresh"> Tự động làm mới (10s)
             </label>
         </div>
         <div id="sharedTokenMsg" style="display: none; color: #155724; font-size: 13px; font-style: italic; margin-top: -10px; margin-bottom: 15px; padding-left: 5px;">
             Đang sử dụng Token cộng đồng được chia sẻ bởi một người tốt
+        </div>
+        <div id="backupDataMsg" style="display: none; color: #dc3545; font-size: 13px; font-style: italic; margin-top: -10px; margin-bottom: 15px; padding-left: 5px;">
+            ⚠️ <b>Chú ý:</b> Web ĐKHP đang đóng cửa (chỉ mở 9h-16h) hoặc Token lỗi. Hệ thống đang dùng <b>Dữ liệu Backup</b> để bạn thực hành!
         </div>
 
         <h2>Danh sách Lớp mở chờ đăng ký <span id="stats" style="font-weight:normal; font-size: 14px; margin-left: 20px; color: #666;">Chưa tải dữ liệu</span></h2>

@@ -590,7 +590,10 @@ async function fetchCourses(isAuto = false, isInitial = false) {
         }
         
         const data = await response.json();
-        rawData = data.courses || data;
+        rawData = data.courses || data.data || data;
+        
+        const backupMsg = document.getElementById('backupDataMsg');
+        if (backupMsg) backupMsg.style.display = 'none';
         
         if (!token && sharedTokenMsg) {
             sharedTokenMsg.style.display = 'block';
@@ -636,14 +639,17 @@ async function fetchCourses(isAuto = false, isInitial = false) {
                 window.hasShownBackupWarning = true;
             }
             
-            stats.innerText = `(DỮ LIỆU MẪU 2026 - ${rawData.length} lớp)`;
+            stats.innerText = `(DỮ LIỆU MẪU 23/8/2026 - ${rawData.length} lớp)`;
             stats.style.color = '#ff9800';
             stats.style.fontWeight = 'bold';
             
             if (sharedTokenMsg) sharedTokenMsg.style.display = 'none';
+            const backupMsg = document.getElementById('backupDataMsg');
+            if (backupMsg) backupMsg.style.display = 'block';
+            
             if (tokenInput) {
-                tokenInput.style.backgroundColor = '';
-                tokenInput.style.borderColor = '';
+                tokenInput.style.backgroundColor = '#fff3cd'; // Màu vàng cảnh báo
+                tokenInput.style.borderColor = '#ffeeba';
             }
             
             searchInput.dispatchEvent(new Event('input'));
@@ -665,6 +671,107 @@ async function fetchCourses(isAuto = false, isInitial = false) {
 }
 
 refreshBtn.addEventListener('click', () => fetchCourses(false, false));
+
+const excelUpload = document.getElementById('excelUpload');
+excelUpload.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, {type: 'array'});
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            
+            // Chuyển excel thành mảng json (bỏ qua các dòng trống ở đầu tự động bằng blankrows: false)
+            // Tuy nhiên, do có 7 dòng title rác, ta parse raw trước để tìm dòng header
+            const rawJson = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+            
+            let headerRowIndex = -1;
+            for (let i = 0; i < Math.min(20, rawJson.length); i++) {
+                const rowStr = (rawJson[i] || []).join('').toUpperCase();
+                if (rowStr.includes('STT') || rowStr.includes('MAMH') || rowStr.includes('MÃ MH')) {
+                    headerRowIndex = i;
+                    break;
+                }
+            }
+            
+            if (headerRowIndex === -1) {
+                throw new Error("Không tìm thấy dòng tiêu đề (STT, MÃ MH...) trong file Excel.");
+            }
+            
+            // Đọc lại với header đúng
+            const rows = XLSX.utils.sheet_to_json(worksheet, { range: headerRowIndex });
+            
+            rawData = normalizeExcelData(rows);
+            
+            // Cập nhật giao diện
+            document.getElementById('stats').innerText = `(DỮ LIỆU TỪ EXCEL - ${rawData.length} lớp)`;
+            document.getElementById('stats').style.color = '#28a745';
+            document.getElementById('stats').style.fontWeight = 'bold';
+            
+            const backupMsg = document.getElementById('backupDataMsg');
+            if (backupMsg) backupMsg.style.display = 'none';
+            const sharedTokenMsg = document.getElementById('sharedTokenMsg');
+            if (sharedTokenMsg) sharedTokenMsg.style.display = 'none';
+            
+            Swal.fire({
+                title: 'Thành công',
+                text: `Đã nạp ${rawData.length} lớp học từ file Excel.`,
+                icon: 'success',
+                timer: 3000,
+                showConfirmButton: false
+            });
+            
+            searchInput.dispatchEvent(new Event('input'));
+            
+        } catch (error) {
+            Swal.fire('Lỗi đọc file', error.message, 'error');
+        }
+        
+        // Reset input để upload lại file cũ vẫn ăn event change
+        excelUpload.value = '';
+    };
+    reader.readAsArrayBuffer(file);
+});
+
+function normalizeExcelData(rows) {
+    let normalized = [];
+    rows.forEach(row => {
+        // Lấy các field dựa trên 2 loại format (Không dấu hoặc có dấu tiếng Việt)
+        let malop = row['MALOP'] || row['MÃ LỚP'];
+        if (!malop) return; // Bỏ qua dòng trống
+        
+        let mamh = row['MAMH'] || row['MÃ MH'] || malop.split('.')[0];
+        let tenmh = row['TENMH'] || row['TÊN MÔN HỌC'] || '';
+        let giangvien = row['CBGD'] || row['TENGV'] || row['TÊN GIẢNG VIÊN'] || row['MÃ GIẢNG VIÊN'] || '';
+        let sisotoida = row['SISO'] || row['SĨ SỐ'] || 0;
+        let sotc = row['SOTC'] || row['SỐ TC'] || 0;
+        let isTH = row['THUCHANH'] || row['THỰC HÀNH'];
+        
+        let thu = row['THU'] || row['THỨ'];
+        let tiet = row['TIET'] || row['TIẾT'];
+        // Tái tạo lại chuỗi thời gian học (T2 (1,2,3))
+        let tghoc = '';
+        if (thu && tiet) {
+            tghoc = `T${thu} (${tiet.toString().split('').join(',')})`;
+        }
+        
+        normalized.push({
+            malop: malop.toString().trim(),
+            mamh: mamh.toString().trim(),
+            tenmh: tenmh.toString().trim(),
+            giangvien: giangvien.toString().trim(),
+            sisotoida: parseInt(sisotoida) || 0,
+            sotc: parseInt(sotc) || 0,
+            thuchanh: (isTH == 1 || isTH == '1' || isTH === 'Có') ? 1 : 0,
+            tghoc: tghoc
+        });
+    });
+    return normalized;
+}
 
 let intervalId = null;
 autoRefreshCb.addEventListener('change', (e) => {
