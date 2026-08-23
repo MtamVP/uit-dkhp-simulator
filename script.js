@@ -193,6 +193,34 @@ function deleteSelectedCourses() {
 // -------------------------
 // SIMULATION LOGIC & MODAL
 // -------------------------
+function parseSchedule(tghoc) {
+    if (!tghoc) return [];
+    const regex = /T(\d)\s*\(([\d,]+)\)/g;
+    let match;
+    const sessions = [];
+    while ((match = regex.exec(tghoc)) !== null) {
+        const thu = parseInt(match[1]);
+        const periods = match[2].split(',').map(Number);
+        sessions.push({ thu, periods });
+    }
+    return sessions;
+}
+
+function checkConflict(courseA, courseB) {
+    const sessionsA = parseSchedule(courseA.tghoc);
+    const sessionsB = parseSchedule(courseB.tghoc);
+    
+    for (let sa of sessionsA) {
+        for (let sb of sessionsB) {
+            if (sa.thu === sb.thu) {
+                const overlap = sa.periods.some(p => sb.periods.includes(p));
+                if (overlap) return true;
+            }
+        }
+    }
+    return false;
+}
+
 function registerSelectedCourses() {
     if (selectedCoursesToRegister.size === 0) return;
     
@@ -201,14 +229,114 @@ function registerSelectedCourses() {
     let successCount = 0;
     let errorCount = 0;
     
-    selectedCoursesToRegister.forEach((course, malop) => {
-        // Kiểm tra xem đã đăng ký lớp này chưa
-        if (!registeredCourses.find(c => c.malop === malop)) {
-            registeredCourses.push(course);
-            successListHtml += `<div>${malop}: Đăng ký thành công</div>`;
-            successCount++;
-        } else {
-            errorListHtml += `<div>${malop}: Lỗi (Đã đăng ký trước đó)</div>`;
+    let pendingToAdd = Array.from(selectedCoursesToRegister.values());
+    let currentRegistered = [...registeredCourses];
+    let errors = new Map(); // malop -> reason
+    
+    // 1. Quét tìm danh sách các môn Lý Thuyết BẮT BUỘC có Thực Hành
+    let globalBaseNeedsTH = new Set();
+    rawData.forEach(c => {
+        let isTH = c.malop.includes('.1') || c.malop.includes('.2') || c.malop.includes('.3');
+        if (isTH) {
+            let base = c.malop.substring(0, c.malop.lastIndexOf('.'));
+            globalBaseNeedsTH.add(base);
+        }
+    });
+
+    // 2. Lọc các môn đã đăng ký
+    pendingToAdd = pendingToAdd.filter(course => {
+        if (currentRegistered.find(c => c.malop === course.malop)) {
+            errors.set(course.malop, "Đã đăng ký trước đó");
+            return false;
+        }
+        return true;
+    });
+
+    // 3. Kiểm tra trùng lịch (với môn cũ & nội bộ môn mới)
+    for (let i = 0; i < pendingToAdd.length; i++) {
+        let c1 = pendingToAdd[i];
+        if (errors.has(c1.malop)) continue;
+
+        // Trùng với môn cũ
+        for (let r of currentRegistered) {
+            if (checkConflict(c1, r)) {
+                errors.set(c1.malop, `Trùng lịch với ${r.malop}`);
+                break;
+            }
+        }
+        if (errors.has(c1.malop)) continue;
+        
+        // Trùng nội bộ môn mới
+        for (let j = 0; j < pendingToAdd.length; j++) {
+            if (i === j) continue;
+            let c2 = pendingToAdd[j];
+            if (errors.has(c2.malop)) continue;
+            if (checkConflict(c1, c2)) {
+                errors.set(c1.malop, `Trùng lịch với ${c2.malop}`);
+                errors.set(c2.malop, `Trùng lịch với ${c1.malop}`);
+            }
+        }
+    }
+    
+    pendingToAdd = pendingToAdd.filter(c => !errors.has(c.malop));
+
+    // 4. Kiểm tra ràng buộc LT - TH (lặp lại đến khi không còn lỗi rơi rớt)
+    let constraintChanged = true;
+    while(constraintChanged) {
+        constraintChanged = false;
+        
+        // Tạo map hiện trạng LT/TH
+        let finalState = [...currentRegistered, ...pendingToAdd];
+        let baseMapFinal = new Map();
+        finalState.forEach(c => {
+            let isTH = c.malop.includes('.1') || c.malop.includes('.2') || c.malop.includes('.3');
+            let base = isTH ? c.malop.substring(0, c.malop.lastIndexOf('.')) : c.malop;
+            if (!baseMapFinal.has(base)) baseMapFinal.set(base, { LT: null, TH: [] });
+            if (isTH) baseMapFinal.get(base).TH.push(c);
+            else baseMapFinal.get(base).LT = c;
+        });
+
+        // Duyệt ngược để xoá an toàn
+        for (let i = pendingToAdd.length - 1; i >= 0; i--) {
+            let c = pendingToAdd[i];
+            let isTH = c.malop.includes('.1') || c.malop.includes('.2') || c.malop.includes('.3');
+            let base = isTH ? c.malop.substring(0, c.malop.lastIndexOf('.')) : c.malop;
+            let group = baseMapFinal.get(base);
+            
+            let hasError = false;
+            let errorMsg = '';
+            
+            if (isTH) {
+                if (!group.LT) {
+                    hasError = true;
+                    errorMsg = "Bắt buộc phải đăng ký cùng lớp Lý thuyết";
+                }
+            } else {
+                if (globalBaseNeedsTH.has(base) && group.TH.length === 0) {
+                    hasError = true;
+                    errorMsg = "Bắt buộc phải đăng ký kèm lớp Thực hành";
+                }
+            }
+            
+            if (hasError) {
+                errors.set(c.malop, errorMsg);
+                pendingToAdd.splice(i, 1);
+                constraintChanged = true;
+                break; // Break để map lại từ đầu cho chắc chắn (Hiệu ứng Domino)
+            }
+        }
+    }
+
+    // 5. Tổng hợp kết quả
+    pendingToAdd.forEach(course => {
+        registeredCourses.push(course);
+        successListHtml += `<div>${course.malop}: Đăng ký thành công</div>`;
+        successCount++;
+    });
+
+    Array.from(selectedCoursesToRegister.values()).forEach(course => {
+        if (errors.has(course.malop)) {
+            errorListHtml += `<div>${course.malop}: <span style="color:#dc3545">Lỗi (${errors.get(course.malop)})</span></div>`;
             errorCount++;
         }
     });
