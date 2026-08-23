@@ -24,6 +24,17 @@ function switchTab(tabId) {
     document.getElementById('tab-' + tabId).style.display = 'block';
     document.getElementById('nav-' + tabId).classList.add('active');
     
+    // Cập nhật URL trên trình duyệt
+    const pathMap = {
+        'dashboard': '/dashboard',
+        'register': '/courses',
+        'registered': '/registered',
+        'guide': '/guide'
+    };
+    if (window.location.pathname !== pathMap[tabId]) {
+        history.pushState({ tab: tabId }, '', pathMap[tabId]);
+    }
+    
     // Ẩn/Hiện thanh nổi tuỳ theo tab
     if (tabId === 'register') {
         updateSelectedBar();
@@ -37,6 +48,28 @@ function switchTab(tabId) {
         document.getElementById('selectedDeleteBar').style.display = 'none';
     }
 }
+
+// Lắng nghe sự kiện nút Back/Forward của trình duyệt
+window.addEventListener('popstate', (e) => {
+    if (e.state && e.state.tab) {
+        switchTab(e.state.tab);
+    } else {
+        const path = window.location.pathname;
+        if (path === '/dashboard') switchTab('dashboard');
+        else if (path === '/registered') switchTab('registered');
+        else if (path === '/guide') switchTab('guide');
+        else switchTab('register');
+    }
+});
+
+// Khởi tạo tab mặc định dựa vào URL ban đầu
+window.addEventListener('DOMContentLoaded', () => {
+    const path = window.location.pathname;
+    if (path === '/dashboard') switchTab('dashboard');
+    else if (path === '/registered') switchTab('registered');
+    else if (path === '/guide') switchTab('guide');
+    else switchTab('register');
+});
 
 // -------------------------
 // SELECTED BAR LOGIC

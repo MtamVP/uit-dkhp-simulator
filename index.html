@@ -12,10 +12,10 @@
     <div class="header">
         <div class="header-logo"><span style="color:#0052cc">UIT</span> <span style="color:#20a8d8">- ĐKHP</span></div>
         <div class="header-nav">
-            <a href="#" onclick="switchTab('dashboard')" id="nav-dashboard">Dashboard</a>
-            <a href="#" onclick="switchTab('register')" id="nav-register" class="active">Đăng ký Học phần</a>
-            <a href="#" onclick="switchTab('registered')" id="nav-registered">Danh sách Lớp Đã Đăng ký</a>
-            <a href="#" onclick="switchTab('guide')" id="nav-guide">Hướng dẫn lấy Token</a>
+            <a href="/dashboard" onclick="event.preventDefault(); switchTab('dashboard')" id="nav-dashboard">Dashboard</a>
+            <a href="/courses" onclick="event.preventDefault(); switchTab('register')" id="nav-register" class="active">Đăng ký Học phần</a>
+            <a href="/registered" onclick="event.preventDefault(); switchTab('registered')" id="nav-registered">Danh sách Lớp Đã Đăng ký</a>
+            <a href="/guide" onclick="event.preventDefault(); switchTab('guide')" id="nav-guide">Hướng dẫn lấy Token</a>
         </div>
         <div class="user-info" style="display: flex; align-items: center; gap: 20px;">
             <a href="https://github.com/MtamVP/uit-dkhp-simulator" target="_blank" style="color: #333; text-decoration: none; display: flex; align-items: center; gap: 5px; background: #f0f0f0; padding: 5px 12px; border-radius: 20px; border: 1px solid #ccc; font-size: 13px;">
