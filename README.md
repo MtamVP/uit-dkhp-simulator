@@ -1,7 +1,7 @@
 <div align="center">
   <img src="assets/logo.png" alt="UIT DKHP Simulator Logo" width="200" />
   <h1>UIT DKHP Simulator</h1>
-  <p><em>Hệ thống Đăng ký Học phần Mô phỏng dành cho Sinh viên UIT</em></p>
+  <p><em>Hệ thống mô phỏng đăng kí học phần dành cho Sinh viên UIT</em></p>
 </div>
 
 ---

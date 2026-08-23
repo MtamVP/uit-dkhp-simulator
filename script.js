@@ -575,12 +575,44 @@ async function fetchCourses(isAuto = false, isInitial = false) {
         searchInput.dispatchEvent(new Event('input'));
         
     } catch (error) {
-        if (!isAuto && !isInitial) {
-            Swal.fire('Lỗi', error.message, 'error');
-        } else if (isInitial) {
-            document.getElementById('stats').innerText = `(${error.message})`;
-            document.getElementById('stats').style.color = '#dc3545';
+        // --- HỆ THỐNG DỮ LIỆU DỰ PHÒNG ---
+        try {
+            const backupRes = await fetch('/assets/backup_courses.json');
+            const backupData = await backupRes.json();
+            rawData = backupData.courses || backupData.data || backupData;
+            
+            if (!isAuto && !isInitial && !window.hasShownBackupWarning) {
+                window.hasShownBackupWarning = true;
+                Swal.fire({
+                    title: 'Dùng Dữ Liệu Dự Phòng 2026',
+                    html: 'Không thể tải dữ liệu thực (có thể chưa tới đợt ĐKHP hoặc Token không hợp lệ).<br><br>Hệ thống đã tự động nạp <b>Dữ liệu mẫu (Backup) năm 2026</b> để bạn vẫn có thể thực hành các thao tác chọn/xoá môn như thật!',
+                    icon: 'warning'
+                });
+            } else {
+                window.hasShownBackupWarning = true;
+            }
+            
+            stats.innerText = `(DỮ LIỆU MẪU 2026 - ${rawData.length} lớp)`;
+            stats.style.color = '#ff9800';
+            stats.style.fontWeight = 'bold';
+            
+            if (sharedTokenMsg) sharedTokenMsg.style.display = 'none';
+            if (tokenInput) {
+                tokenInput.style.backgroundColor = '';
+                tokenInput.style.borderColor = '';
+            }
+            
+            searchInput.dispatchEvent(new Event('input'));
+        } catch (backupErr) {
+            // Nếu mất cả file backup thì báo lỗi gốc
+            if (!isAuto && !isInitial) {
+                Swal.fire('Lỗi', error.message, 'error');
+            } else if (isInitial) {
+                document.getElementById('stats').innerText = `(${error.message})`;
+                document.getElementById('stats').style.color = '#dc3545';
+            }
         }
+        
         if (isAuto) autoRefreshCb.checked = false;
     } finally {
         refreshBtn.innerText = 'Tải Dữ Liệu';
