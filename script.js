@@ -293,6 +293,38 @@ function registerSelectedCourses() {
         return true;
     });
 
+    // 2.5 Kiểm tra trùng Môn học (không được đăng ký 2 lớp Lý thuyết hoặc 2 lớp Thực hành của cùng 1 môn)
+    for (let i = 0; i < pendingToAdd.length; i++) {
+        let c1 = pendingToAdd[i];
+        if (errors.has(c1.malop)) continue;
+        
+        let mamh1 = c1.mamh || c1.malop.split('.')[0];
+        let isTH1 = c1.thuchanh === 1 || c1.malop.includes('.1') || c1.malop.includes('.2') || c1.malop.includes('.3');
+
+        // So với môn đã đăng ký thành công trước đó
+        for (let r of currentRegistered) {
+            let mamhR = r.mamh || r.malop.split('.')[0];
+            let isTHR = r.thuchanh === 1 || r.malop.includes('.1') || r.malop.includes('.2') || r.malop.includes('.3');
+            if (mamh1 === mamhR && isTH1 === isTHR) {
+                errors.set(c1.malop, `Đã đăng ký lớp ${r.malop} của môn này`);
+                break;
+            }
+        }
+        if (errors.has(c1.malop)) continue;
+
+        // So với các môn đang được tick chọn cùng lúc
+        for (let j = 0; j < i; j++) {
+            let c2 = pendingToAdd[j];
+            if (errors.has(c2.malop)) continue;
+            let mamh2 = c2.mamh || c2.malop.split('.')[0];
+            let isTH2 = c2.thuchanh === 1 || c2.malop.includes('.1') || c2.malop.includes('.2') || c2.malop.includes('.3');
+            if (mamh1 === mamh2 && isTH1 === isTH2) {
+                errors.set(c1.malop, `Trùng môn học với lớp ${c2.malop}`);
+                break;
+            }
+        }
+    }
+
     // 3. Kiểm tra trùng lịch (với môn cũ & nội bộ môn mới)
     for (let i = 0; i < pendingToAdd.length; i++) {
         let c1 = pendingToAdd[i];
