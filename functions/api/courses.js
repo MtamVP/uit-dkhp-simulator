@@ -4,19 +4,25 @@ export async function onRequestGet(context) {
   let authHeader = request.headers.get("Authorization");
   let usedShared = false;
   
-  if (authHeader) {
-    if (env.DKHP_KV) {
-      await env.DKHP_KV.put("SHARED_TOKEN", authHeader);
+  let kvStatus = env.DKHP_KV ? "Đã liên kết (Bound)" : "Chưa liên kết (Unbound)";
+
+  try {
+    if (authHeader) {
+      if (env.DKHP_KV) {
+        await env.DKHP_KV.put("SHARED_TOKEN", authHeader);
+      }
+    } else {
+      if (env.DKHP_KV) {
+        authHeader = await env.DKHP_KV.get("SHARED_TOKEN");
+        usedShared = true;
+      }
     }
-  } else {
-    if (env.DKHP_KV) {
-      authHeader = await env.DKHP_KV.get("SHARED_TOKEN");
-      usedShared = true;
-    }
+  } catch (err) {
+    kvStatus = "Lỗi đọc ghi: " + err.message;
   }
 
   if (!authHeader) {
-    return new Response(JSON.stringify({ error: "Chưa có ai đóng góp Token. Vui lòng dán Token của bạn để chia sẻ cho mọi người!" }), {
+    return new Response(JSON.stringify({ error: `Chưa có ai đóng góp Token. Vui lòng dán Token của bạn để chia sẻ cho mọi người! (Trạng thái KV: ${kvStatus})` }), {
       status: 401,
       headers: { "Content-Type": "application/json" }
     });
