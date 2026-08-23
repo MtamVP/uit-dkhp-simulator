@@ -619,7 +619,6 @@ searchInput.addEventListener('input', (e) => {
     renderTable(filtered);
 });
 
-// Không bắt buộc phải có Token mới gọi hàm ban đầu nữa
 fetchCourses(false, true);
 
 // POPUP WELCOME CHÀO MỪNG
