@@ -632,6 +632,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p>Chào mừng bạn đến với Hệ thống Đăng ký Học phần Mô phỏng!</p>
                     <p>Hệ thống có tính năng <b>Token Cộng Đồng</b>: Khi bạn dán Token vào có thể giúp những bạn khóa dưới cũng có thể xem được tình trạng môn học.</p>
                     <p><b>Cam kết bảo mật:</b> Token của bạn được mã hóa và lưu trực tiếp trên Cloudflare. Hệ thống chỉ dùng nó thay mặt bạn lấy dữ liệu môn học từ trường, <b>tuyệt đối không hiển thị</b> ra ngoài hay lưu vết trên trình duyệt của người khác. An toàn 100%!</p>
+                    <p>Hệ thống chỉ ghi nhận 1 token duy nhất cho 1 phiên 24h/token.Sau khi token hết hạn thì khỏi xem.</p>
                     <hr>
                     <label style="display: flex; align-items: center; justify-content: center; gap: 5px; cursor: pointer; font-size: 14px; margin-top: 15px;">
                         <input type="checkbox" id="dontShowAgain"> Không hiển thị lại thông báo này
