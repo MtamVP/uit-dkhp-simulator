@@ -21,6 +21,9 @@ Các bạn sinh viên UIT, đặc biệt là các bạn tân sinh viên mới v�
 - **Kỳ vọng:** Mình mong mọi người sẽ sử dụng tool này với tinh thần dĩ hòa vi quý, xem như 1 công cụ giúp đỡ chứ không phải 1 tools để gian lận hay gì cả
 
 ## Lời cảm ơn
-Mình thật lòng cảm ơn mọi người đã sử dụng web ạ. Bên cạnh đó mình thật lòng biết ơn những anh chị khóa trên và mọi người đã giúp không chỉ mình và các bạn khóa dưới bằng cách ủng hộ token giúp web hoạt động trong các mùa ĐKHP ạ. Respect mọi người rất nhiều ạ. 
+Mình thật lòng cảm ơn mọi người đã sử dụng web ạ. Bên cạnh đó mình thật lòng biết ơn những anh chị khóa trên và mọi người đã giúp không chỉ mình và các bạn khóa dưới bằng cách ủng hộ token giúp web hoạt động trong các mùa ĐKHP ạ. Respect mọi người rất nhiều ạ.
+
+Đặc biệt cảm ơn tới anh Nguyễn Huỳnh Lợi người đã làm ra tools xếp tkb này: <a href="https://dkhp-uit.vercel.app/">Web xếp tkb</a>
+
 ---
 *Phát triển bởi VstarK*
