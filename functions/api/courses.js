@@ -4,11 +4,6 @@ export async function onRequestGet(context) {
   let authHeader = request.headers.get("Authorization");
   let usedShared = false;
   
-  let envKeys = Object.keys(env || {}).join(", ");
-  let type = typeof env.UIT_DKHP_KV;
-  let val = String(env.UIT_DKHP_KV);
-  let kvStatus = `Type: ${type}, Val: ${val}, Keys: [${envKeys}]`;
-
   try {
     if (authHeader) {
       if (env.UIT_DKHP_KV) {
@@ -21,11 +16,11 @@ export async function onRequestGet(context) {
       }
     }
   } catch (err) {
-    kvStatus = "Lỗi đọc ghi: " + err.message;
+    console.error("KV Error:", err);
   }
 
   if (!authHeader) {
-    return new Response(JSON.stringify({ error: `Chưa có ai đóng góp Token. Vui lòng dán Token của bạn để chia sẻ cho mọi người! (Trạng thái KV: ${kvStatus})` }), {
+    return new Response(JSON.stringify({ error: "Chưa có ai đóng góp Token. Vui lòng dán Token của bạn để chia sẻ cho mọi người!" }), {
       status: 401,
       headers: { "Content-Type": "application/json" }
     });

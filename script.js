@@ -500,7 +500,7 @@ function renderTable(data) {
     tableBody.innerHTML = htmlContent;
 }
 
-async function fetchCourses(isAuto = false) {
+async function fetchCourses(isAuto = false, isInitial = false) {
     let token = tokenInput.value.trim();
     
     if (token && !token.startsWith('Bearer ')) {
@@ -512,6 +512,13 @@ async function fetchCourses(isAuto = false) {
         localStorage.setItem('dkhp_token', token);
     } else {
         localStorage.removeItem('dkhp_token');
+    }
+    
+    const sharedTokenMsg = document.getElementById('sharedTokenMsg');
+    if (sharedTokenMsg) {
+        sharedTokenMsg.style.display = 'none';
+        tokenInput.style.backgroundColor = '';
+        tokenInput.style.borderColor = '';
     }
     
     refreshBtn.innerText = 'Đang tải...';
@@ -545,16 +552,33 @@ async function fetchCourses(isAuto = false) {
         const data = await response.json();
         rawData = data.courses || data;
         
+        if (!token && sharedTokenMsg) {
+            sharedTokenMsg.style.display = 'block';
+            tokenInput.style.backgroundColor = '#e8f5e9';
+            tokenInput.style.borderColor = '#c3e6cb';
+        } else if (token && !isAuto && !isInitial) {
+            // Hiện lời cảm ơn nếu user tự nhập token và bấm Tải Dữ Liệu thành công
+            Swal.fire({
+                title: 'Cảm ơn bạn đã chia sẻ!',
+                html: 'Hành động chia sẻ Token của bạn vừa giúp đỡ rất nhiều sinh viên khác.<br><br><i>Token của bạn đã được hệ thống mã hoá và lưu trữ an toàn trên cloudflare, không ai có thể xem được!</i>',
+                icon: 'success',
+                timer: 4500,
+                showConfirmButton: false
+            });
+        }
+        
         stats.innerText = `(Tổng cộng: ${rawData.length} lớp - Cập nhật lúc: ${new Date().toLocaleTimeString()})`;
         
         searchInput.dispatchEvent(new Event('input'));
         
     } catch (error) {
-        stats.innerText = `Lỗi tải dữ liệu lúc: ${new Date().toLocaleTimeString()}`;
-        console.error(error);
-        if (!autoRefreshCb.checked) {
+        if (!isAuto && !isInitial) {
             Swal.fire('Lỗi', error.message, 'error');
+        } else if (isInitial) {
+            document.getElementById('stats').innerText = `(${error.message})`;
+            document.getElementById('stats').style.color = '#dc3545';
         }
+        if (isAuto) autoRefreshCb.checked = false;
     } finally {
         refreshBtn.innerText = 'Tải Dữ Liệu';
         refreshBtn.disabled = false;
@@ -593,4 +617,33 @@ searchInput.addEventListener('input', (e) => {
 });
 
 // Không bắt buộc phải có Token mới gọi hàm ban đầu nữa
-fetchCourses();
+fetchCourses(false, true);
+
+// POPUP WELCOME CHÀO MỪNG
+document.addEventListener('DOMContentLoaded', () => {
+    if (!localStorage.getItem('hideWelcomePopup')) {
+        Swal.fire({
+            title: 'Một Người Vì Mọi Người!',
+            html: `
+                <div style="text-align: left; font-size: 15px; line-height: 1.6;">
+                    <p>Chào mừng bạn đến với Hệ thống Đăng ký Học phần Mô phỏng!</p>
+                    <p>Hệ thống có tính năng <b>Token Cộng Đồng</b>: Khi bạn dán Token vào có thể giúp những bạn khóa dưới cũng có thể xem được tình trạng môn học.</p>
+                    <p><b>Cam kết bảo mật:</b> Token của bạn được mã hóa và lưu trực tiếp trên Cloudflare. Hệ thống chỉ dùng nó thay mặt bạn lấy dữ liệu môn học từ trường, <b>tuyệt đối không hiển thị</b> ra ngoài hay lưu vết trên trình duyệt của người khác. An toàn 100%!</p>
+                    <hr>
+                    <label style="display: flex; align-items: center; justify-content: center; gap: 5px; cursor: pointer; font-size: 14px; margin-top: 15px;">
+                        <input type="checkbox" id="dontShowAgain"> Không hiển thị lại thông báo này
+                    </label>
+                </div>
+            `,
+            icon: 'info',
+            confirmButtonText: 'Tuyệt vời, tôi đã hiểu!',
+            confirmButtonColor: '#28a745',
+            preConfirm: () => {
+                const cb = document.getElementById('dontShowAgain');
+                if (cb && cb.checked) {
+                    localStorage.setItem('hideWelcomePopup', 'true');
+                }
+            }
+        });
+    }
+});
