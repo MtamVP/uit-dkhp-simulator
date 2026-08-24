@@ -14,8 +14,8 @@
         <div class="header-logo"><span style="color:#0052cc">UIT</span> <span style="color:#3CB4A6">- ĐKHP</span></div>
         <div class="header-nav">
             <a href="/dashboard" onclick="event.preventDefault(); switchTab('dashboard')" id="nav-dashboard">Dashboard</a>
-            <a href="/courses" onclick="event.preventDefault(); switchTab('register')" id="nav-register" class="active">Đăng ký Học phần</a>
-            <a href="/registered" onclick="event.preventDefault(); switchTab('registered')" id="nav-registered">Danh sách Lớp Đã Đăng ký</a>
+            <a href="/reg" onclick="event.preventDefault(); switchTab('reg')" id="nav-reg" class="active">Đăng ký Học phần</a>
+            <a href="/courses" onclick="event.preventDefault(); switchTab('courses')" id="nav-courses">Danh sách Lớp Đã Đăng ký</a>
             <a href="/guide" onclick="event.preventDefault(); switchTab('guide')" id="nav-guide">Hướng dẫn lấy Token</a>
             <a href="/everytime" onclick="event.preventDefault(); switchTab('everytime')" id="nav-everytime" style="color: #e53935; font-weight: bold;">Tải app Everytime</a>
             <a href="https://dkhp-uit.vercel.app/" target="_blank" style="color: #ff9800; font-weight: bold;">Xếp TKB ↗</a>
@@ -68,7 +68,7 @@
     </div>
     
     <!-- MÀN HÌNH ĐĂNG KÝ -->
-    <div class="container" id="tab-register">
+    <div class="container" id="tab-reg">
         <div class="settings-bar">
             <input type="text" id="tokenInput" placeholder="Nhập Token của bạn vào đây, nếu không có tự động xài Token cộng đồng..." style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
             <button id="refreshBtn">Tải Dữ Liệu</button>
@@ -119,7 +119,7 @@
     </div>
 
     <!-- MÀN HÌNH LỚP ĐÃ ĐĂNG KÝ -->
-    <div class="container" id="tab-registered" style="display: none;">
+    <div class="container" id="tab-courses" style="display: none;">
         <h2 id="registered-title" style="color: #000; font-size: 18px;">Danh Sách Lớp học Đã Đăng ký</h2>
         <table id="registeredTable">
             <thead>
@@ -211,7 +211,7 @@
             </div>
             
             <div style="text-align: center; margin-top: 30px;">
-                <button onclick="switchTab('register')" class="btn-register-teal">Đã hiểu, quay lại Đăng ký ngay</button>
+                <button onclick="switchTab('reg')" class="btn-register-teal">Đã hiểu, quay lại Đăng ký ngay</button>
             </div>
         </div>
     </div>

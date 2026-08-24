@@ -12,15 +12,15 @@ let selectedCoursesToDelete = new Map(); // malop -> course object
 // -------------------------
 function switchTab(tabId) {
     document.getElementById('tab-dashboard').style.display = 'none';
-    document.getElementById('tab-register').style.display = 'none';
-    document.getElementById('tab-registered').style.display = 'none';
+    document.getElementById('tab-reg').style.display = 'none';
+    document.getElementById('tab-courses').style.display = 'none';
     document.getElementById('tab-guide').style.display = 'none';
     const everytimeTab = document.getElementById('tab-everytime');
     if (everytimeTab) everytimeTab.style.display = 'none';
     
     document.getElementById('nav-dashboard').classList.remove('active');
-    document.getElementById('nav-register').classList.remove('active');
-    document.getElementById('nav-registered').classList.remove('active');
+    document.getElementById('nav-reg').classList.remove('active');
+    document.getElementById('nav-courses').classList.remove('active');
     document.getElementById('nav-guide').classList.remove('active');
     const navEvery = document.getElementById('nav-everytime');
     if (navEvery) navEvery.classList.remove('active');
@@ -32,8 +32,8 @@ function switchTab(tabId) {
     // Cập nhật URL trên trình duyệt
     const pathMap = {
         'dashboard': '/dashboard',
-        'register': '/courses',
-        'registered': '/registered',
+        'reg': '/reg',
+        'courses': '/courses',
         'guide': '/guide',
         'everytime': '/everytime'
     };
@@ -42,10 +42,10 @@ function switchTab(tabId) {
     }
     
     // Ẩn/Hiện thanh nổi tuỳ theo tab
-    if (tabId === 'register') {
+    if (tabId === 'reg') {
         updateSelectedBar();
         document.getElementById('selectedDeleteBar').style.display = 'none';
-    } else if (tabId === 'registered') {
+    } else if (tabId === 'courses') {
         renderRegisteredTable();
         updateSelectedDeleteBar();
         document.getElementById('selectedBar').style.display = 'none';
@@ -62,10 +62,10 @@ window.addEventListener('popstate', (e) => {
     } else {
         const path = window.location.pathname;
         if (path === '/dashboard') switchTab('dashboard');
-        else if (path === '/registered') switchTab('registered');
+        else if (path === '/courses') switchTab('courses');
         else if (path === '/guide') switchTab('guide');
         else if (path === '/everytime') switchTab('everytime');
-        else switchTab('register');
+        else switchTab('reg');
     }
 });
 
@@ -73,10 +73,10 @@ window.addEventListener('popstate', (e) => {
 window.addEventListener('DOMContentLoaded', () => {
     const path = window.location.pathname;
     if (path === '/dashboard') switchTab('dashboard');
-    else if (path === '/registered') switchTab('registered');
+    else if (path === '/courses') switchTab('courses');
     else if (path === '/guide') switchTab('guide');
     else if (path === '/everytime') switchTab('everytime');
-    else switchTab('register');
+    else switchTab('reg');
 });
 
 // -------------------------
@@ -114,7 +114,7 @@ function updateSelectedBar() {
     }
     
     // Only show if we are on the register tab
-    if (document.getElementById('tab-register').style.display !== 'none') {
+    if (document.getElementById('tab-reg').style.display !== 'none') {
         bar.style.display = 'flex';
     }
     
@@ -167,7 +167,7 @@ function updateSelectedDeleteBar() {
         return;
     }
     
-    if (document.getElementById('tab-registered').style.display !== 'none') {
+    if (document.getElementById('tab-courses').style.display !== 'none') {
         bar.style.display = 'flex';
     }
     
