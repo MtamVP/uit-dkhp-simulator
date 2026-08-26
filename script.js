@@ -1,4 +1,20 @@
 // -------------------------
+// SECURITY LOGIC
+// -------------------------
+function sanitizeHTML(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>'"]/g, 
+        tag => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            "'": '&#39;',
+            '"': '&quot;'
+        }[tag] || tag)
+    );
+}
+
+// -------------------------
 // STATE MANAGEMENT
 // -------------------------
 let rawData = [];
@@ -457,8 +473,8 @@ function renderRegisteredTable() {
     registeredCourses.forEach(course => {
         totalCredits += course.sotc;
         
-        const mamh = course.mamh || course.malop.split('.')[0];
-        const tenMhHtml = `<b>${mamh}</b><br><span style="color:#666">${course.tenmh}</span>`;
+        const mamh = sanitizeHTML(course.mamh || course.malop.split('.')[0]);
+        const tenMhHtml = `<b>${mamh}</b><br><span style="color:#666">${sanitizeHTML(course.tenmh)}</span>`;
         
         let thoiGian = course.tghoc || '';
         if (course.ngaybatdau && course.ngayketthuc) {
@@ -475,7 +491,7 @@ function renderRegisteredTable() {
                 <td class="text-blue" style="font-weight: bold;">${course.malop}</td>
                 <td class="text-left text-blue">${tenMhHtml}</td>
                 <td class="text-left text-blue">${thoiGian}</td>
-                <td class="text-blue">${course.giangvien || ''}</td>
+                <td class="text-blue">${sanitizeHTML(course.giangvien || '')}</td>
                 <td>${course.sotc}</td>
                 <td class="text-blue">${course.dadk}/${course.siso}</td>
             </tr>
@@ -511,8 +527,8 @@ function renderTable(data) {
             slotDisplay = `<span class="highlight-red">Hết chỗ</span>`;
         }
         
-        const mamh = course.mamh || course.malop.split('.')[0];
-        const tenMhFull = `${mamh} - ${course.tenmh}`;
+        const mamh = sanitizeHTML(course.mamh || course.malop.split('.')[0]);
+        const tenMhFull = `${mamh} - ${sanitizeHTML(course.tenmh)}`;
 
         let thoiGian = course.tghoc || '';
         if (course.ngaybatdau && course.ngayketthuc) {
@@ -532,7 +548,7 @@ function renderTable(data) {
                 <td class="text-left text-blue">${tenMhFull}</td>
                 <td>${course.sotc}</td>
                 <td class="text-left text-blue">${thoiGian}</td>
-                <td class="text-blue">${giangVien}</td>
+                <td class="text-blue">${sanitizeHTML(giangVien)}</td>
                 <td class="text-blue">${course.dadk}/${course.siso}</td>
                 <td>${slotDisplay}</td>
             </tr>
