@@ -496,7 +496,8 @@ const tokenInput = document.getElementById('tokenInput');
 const refreshBtn = document.getElementById('refreshBtn');
 const autoRefreshCb = document.getElementById('autoRefresh');
 
-tokenInput.value = localStorage.getItem('dkhp_token') || '';
+// Xoá khởi tạo từ localStorage vì lý do bảo mật
+tokenInput.value = '';
 
 function renderTable(data) {
     let htmlContent = '';
@@ -548,12 +549,6 @@ async function fetchCourses(isAuto = false, isInitial = false) {
         tokenInput.value = token;
     }
     
-    if (token) {
-        localStorage.setItem('dkhp_token', token);
-    } else {
-        localStorage.removeItem('dkhp_token');
-    }
-    
     const sharedTokenMsg = document.getElementById('sharedTokenMsg');
     if (sharedTokenMsg) {
         sharedTokenMsg.style.display = 'none';
@@ -594,6 +589,11 @@ async function fetchCourses(isAuto = false, isInitial = false) {
         
         const backupMsg = document.getElementById('backupDataMsg');
         if (backupMsg) backupMsg.style.display = 'none';
+        
+        // Khoá input token lại vì đã có token (do người dùng nhập hoặc token dùng chung đang hoạt động)
+        tokenInput.value = ''; // Xoá token hiển thị để người khác không copy được
+        tokenInput.placeholder = 'Đã có Token đang hoạt động. Không cần nhập thêm.';
+        tokenInput.disabled = true;
         
         if (!token && sharedTokenMsg) {
             sharedTokenMsg.style.display = 'block';
@@ -648,6 +648,8 @@ async function fetchCourses(isAuto = false, isInitial = false) {
             if (backupMsg) backupMsg.style.display = 'block';
             
             if (tokenInput) {
+                tokenInput.disabled = false;
+                tokenInput.placeholder = 'Dán Authorization Token vào đây...';
                 tokenInput.style.backgroundColor = '#fff3cd'; // Màu vàng cảnh báo
                 tokenInput.style.borderColor = '#ffeeba';
             }
@@ -660,6 +662,10 @@ async function fetchCourses(isAuto = false, isInitial = false) {
             } else if (isInitial) {
                 document.getElementById('stats').innerText = `(${error.message})`;
                 document.getElementById('stats').style.color = '#dc3545';
+            }
+            if (tokenInput) {
+                tokenInput.disabled = false;
+                tokenInput.placeholder = 'Dán Authorization Token vào đây...';
             }
         }
         

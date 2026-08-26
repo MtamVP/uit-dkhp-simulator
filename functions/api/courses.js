@@ -3,12 +3,11 @@ export async function onRequestGet(context) {
   const url = "https://dkhpapi.uit.edu.vn/courses";
   let authHeader = request.headers.get("Authorization");
   let usedShared = false;
+  let isNewToken = false;
   
   try {
     if (authHeader) {
-      if (env.UIT_DKHP_KV) {
-        await env.UIT_DKHP_KV.put("SHARED_TOKEN", authHeader);
-      }
+      isNewToken = true;
     } else {
       if (env.UIT_DKHP_KV) {
         authHeader = await env.UIT_DKHP_KV.get("SHARED_TOKEN");
@@ -45,6 +44,15 @@ export async function onRequestGet(context) {
         status: 401,
         headers: { "Content-Type": "application/json" }
       });
+    }
+
+    // NẾU THÀNH CÔNG, LÚC NÀY MỚI LƯU TOKEN VÀO KV
+    if (isNewToken && env.UIT_DKHP_KV) {
+      try {
+        await env.UIT_DKHP_KV.put("SHARED_TOKEN", authHeader);
+      } catch (err) {
+        console.error("KV Put Error:", err);
+      }
     }
 
     const data = await response.text();
